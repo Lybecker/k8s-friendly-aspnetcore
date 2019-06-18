@@ -1,5 +1,6 @@
 FROM mcr.microsoft.com/dotnet/core/aspnet:2.2 AS base
 WORKDIR /app
+ENV ASPNETCORE_URLS http://+:5000
 EXPOSE 5000
 
 FROM mcr.microsoft.com/dotnet/core/sdk:2.2 AS build
