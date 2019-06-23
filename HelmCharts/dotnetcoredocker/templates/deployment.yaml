@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "DotNetCoreDocker.fullname" . }}
+  labels:
+{{ include "DotNetCoreDocker.labels" . | indent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "DotNetCoreDocker.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "DotNetCoreDocker.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      restartPolicy: Always
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort:  {{ .Values.containerPort }} 
+              protocol: TCP
+            - name: https
+              containerPort:  {{ .Values.containerPortHttps }} 
+              protocol: TCP
+          # livenessProbe:
+          #   httpGet:
+          #     path: /api/health
+          #     port: {{ .Values.containerPort }} 
+          # readinessProbe:
+          #   httpGet:
+          #     path: /api/health/ready
+          #     port: {{ .Values.containerPort }} 
+            # initialDelaySeconds: 10 # Start probing after 10 seconds of container creation.
+            # timeoutSeconds: 1 # Timeout if you don't get a response in 1 second.
+            # periodSeconds: 10 # Probe frequency in seconds.
+            # failureThreshold: 2 # Probe declares failure after 2 attempts.
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
+          env:
+          - name: MyVar
+            value: "blah"
+          - name: Kestrel__Certificates__Default__Path
+            value: /root/.dotnet/https/aspnetcore-cert.pfx
+          - name: Kestrel__Certificates__Default__Password
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Release.Name }}-secret
+                key: certificatePassword
+          volumeMounts:
+          - name: certificatesvolume
+            mountPath: /root/.dotnet/https/aspnetcore-cert.pfx
+            subPath: aspnetcore-cert.pfx
+            readOnly: true
+      volumes:
+      - name: certificatesvolume
+        secret:
+          secretName: {{ .Release.Name }}-secret
+          items:
+          - key: certificate
+            path: aspnetcore-cert.pfx

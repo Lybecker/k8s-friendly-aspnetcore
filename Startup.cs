@@ -34,7 +34,8 @@ namespace dotnetcore_docker
                 app.UseHsts();
             }
 
-            app.UseHttpsRedirection();
+            // Disabled the HTTPS redirect
+            // app.UseHttpsRedirection();
             app.UseMvc();
         }
     }
