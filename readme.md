@@ -6,7 +6,7 @@ Skeleton sample project for a Docker container friendly ASP.NET core application
  - Health endpoint for probes - used for warmup process and to determind if process is responsive
  - Graceful shutdown with SIGTERM and SIGKILL - giving the application time to cleanup connections etc.
 
-# Install on Kubernetes cluster
+# Test on Kubernetes cluster
 Assuming you have a cluster, kubectl and [helm](https://helm.sh) configured.
 
 1. Clone this repository
@@ -23,8 +23,8 @@ Assuming you have a cluster, kubectl and [helm](https://helm.sh) configured.
     curl --insecure -i https://<ip-address>/api/values
     ```
 
-# Step-by-step walk-through
-Clone this repository
+# Details
+
 ## Built Docker image
 Run command in the directory where the Dockerfile is located
 ```bash
@@ -33,14 +33,16 @@ docker build --tag myaspnetcoreimage:v1 .
 
 > Requires [Docker installed and running](https://docs.docker.com/install/) locally
 
-### Volume mount HTTPS certificate
+## Volume mount HTTPS certificate
 Create a self-signed certificate and export it to a file:
 
 ```bash
 dotnet dev-certs https -v -ep .\HelmCharts\dotnetcoredocker\templates\_aspnetcore-cert.pfx -p createyourownpassword
 ```
 
-### Try to run the container locally with self-signed certificate
+> The certificate is stored in the Helm templates folder, as Helm Charts does not currently support files as parameters (issue [#3276](https://github.com/helm/helm/issues/3276)).
+
+## Try to run the container locally with self-signed certificate
 
 This is how we will run the container 
 - exposing port 5000 & 5001- mount volumne .\HelmCharts\dotnetcoredocker\templates\ to /root/.dotnet/https
@@ -57,7 +59,7 @@ docker run --name myaspnetcorecontainer
     -v .\HelmCharts\dotnetcoredocker\templates\:/root/.dotnet/https 
     myaspnetcoreimage:v1
 ``` 
-> Expose both HTTP and HTTPS on non-standard ports. Because I can.
+> Expose both HTTP and HTTPS on non-standard ports. Normally port 80 and 443 is used. This is just to show what is required to use other ports.
 
 ## Kubernetes liveness and readiness probes
 A custom `HealthController` is used for health monitoring. You could use the build-in [health monitoring in ASP.NET Core](https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/health-checks?view=aspnetcore-2.2).
@@ -80,14 +82,11 @@ readinessProbe:
 ## Graceful shutdown
 Sometimes it is required to buy some time for shutdown of a process. Perhaps a transaction needs to be completed or a connections needs to be properly closed. That is why we need the ability to shutdown gracefully.
 
-ASP.NET Core exposes [application life-cycle events](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/generic-host?view=aspnetcore-2.2#iapplicationlifetime-interface).
+ASP.NET Core exposes [application life-cycle events](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/generic-host?view=aspnetcore-2.2#iapplicationlifetime-interface) for this purpose.
 
 The `LifetimeEventsHostedService` class implements the ASP.NET Core application life-cycle events and simulates a process requiring extra time to shutdown.
 
-> The default allowed shutdown timeout is 5 seconds, but we can increase it by calling the [`UseShutdownTimeout`](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/web-host?view=aspnetcore-2.2#shutdown-timeout) extension method on the WebHostBuilder in our Program.Main() method or configuring with the environment variable `ASPNETCORE_SHUTDOWNTIMEOUTSECONDS`.
-
-
-
+> The default allowed shutdown timeout is 5 seconds, but we can increase it by calling the [`UseShutdownTimeout`](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/web-host?view=aspnetcore-2.2#shutdown-timeout) extension method on the WebHostBuilder in Program.Main() method or configuring with the environment variable `ASPNETCORE_SHUTDOWNTIMEOUTSECONDS`.
 
 # Gotchas
 - The base image from Microsoft Container Registry sets listen to port 80, but can be overwritten by setting `ASPNETCORE_URLS` environment variable in the Dockerfile
