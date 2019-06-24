@@ -2,9 +2,10 @@ Sample project for a Kubernetes friendly ASP.NET core application
  - Dockerfile using [Microsoft Container Registry (MCR)](https://azure.microsoft.com/en-us/blog/microsoft-syndicates-container-catalog/) base images
  - Dockerfile exposing both HTTP and HTTPS custom ports overwritten default [Kestrel settings](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/servers/kestrel?view=aspnetcore-2.2)
  - Helm chart for deployment on Kubernetes cluster
- - Mount HTTPS (TLS/SSL) certificate via volume and use it with Kestrel
+ - Mount HTTPS (TLS/SSL) certificate via volume secret, certificate password as secret and use it with Kestrel
  - Health endpoint for probes - used for warmup process and to determind if process is responsive
  - Graceful shutdown with SIGTERM and SIGKILL - giving the application time to cleanup connections etc.
+ - Specify the compute resources needed to run and maximum consumption
 
 # Test on Kubernetes cluster
 Assuming you have a cluster, kubectl and [helm](https://helm.sh) configured.
@@ -75,13 +76,15 @@ This is how we will run the container
 
 With the following command
 ```bash
-docker run --name myk8sfriendlyaspnetcorecontainer
+docker run --name mmyk8sfriendlyaspnetcorecontainer 
     -p 5000:5000 -p 5001:5001 
-    -e Kestrel__Certificates__Default__Path=/root/.dotnet/https/aspnetcore-cert.pfx
+    -e Kestrel__Certificates__Default__Path=/root/.dotnet/https/_aspnetcore-cert.pfx 
     -e Kestrel__Certificates__Default__Password=createyourownpassword 
     -v .\HelmChart\k8sfriendlyaspnetcore\templates\:/root/.dotnet/https 
-    k8sfriendlyaspnetcore:v1
+    anderslybecker/k8sfriendlyaspnetcore:v1
 ``` 
+> Mounting a volume on Windows does not allow usage of relative paths. Modify the volume mount path to e.g. `c:\Code\k8s-friendly-aspnetcore\HelmChart\k8sfriendlyaspnetcore\templates\`
+
 > Expose both HTTP and HTTPS on non-standard ports. Normally port 80 and 443 is used. This is just to show what is required to use other ports.
 
 ## Kubernetes liveness and readiness probes
@@ -110,6 +113,19 @@ ASP.NET Core exposes [application life-cycle events](https://docs.microsoft.com/
 The `LifetimeEventsHostedService` class implements the ASP.NET Core application life-cycle events and simulates a process requiring extra time to shutdown.
 
 > The default allowed shutdown timeout is 5 seconds, but we can increase it by calling the [`UseShutdownTimeout`](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/web-host?view=aspnetcore-2.2#shutdown-timeout) extension method on the WebHostBuilder in Program.Main() method or configuring with the environment variable `ASPNETCORE_SHUTDOWNTIMEOUTSECONDS`.
+
+## Compute resources needed and maximum
+In the deployment file, the requested and maximum compute resources are specified:
+
+```dockerfile
+resources:
+  requests:
+    memory: "128Mi"
+    cpu: "100m"
+  limits:
+    memory: "256Mi"
+    cpu: "500m"
+```
 
 # Gotchas
 - The base image from Microsoft Container Registry sets listen to port 80, but can be overwritten by setting `ASPNETCORE_URLS` environment variable in the Dockerfile
