@@ -45,10 +45,10 @@ dotnet dev-certs https -v -ep .\HelmCharts\dotnetcoredocker\templates\_aspnetcor
 ## Try to run the container locally with self-signed certificate
 
 This is how we will run the container 
-- exposing port 5000 & 5001- mount volumne .\HelmCharts\dotnetcoredocker\templates\ to /root/.dotnet/https
+- exposing port 5000 & 5001
 - Set `Kestrel__Certificates__Default__Path` path to the certificate location
 - Set `Kestrel__Certificates__Default__Password` value of the password
-- mount volume with certificate to /root/.dotnet/https
+- mount volume with certificate .\HelmCharts\dotnetcoredocker\templates\ to /root/.dotnet/https
 
 With the following command
 ```bash
