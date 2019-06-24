@@ -32,18 +32,18 @@ spec:
             - name: https
               containerPort:  {{ .Values.containerPortHttps }} 
               protocol: TCP
-          # livenessProbe:
-          #   httpGet:
-          #     path: /api/health
-          #     port: {{ .Values.containerPort }} 
-          # readinessProbe:
-          #   httpGet:
-          #     path: /api/health/ready
-          #     port: {{ .Values.containerPort }} 
-            # initialDelaySeconds: 10 # Start probing after 10 seconds of container creation.
-            # timeoutSeconds: 1 # Timeout if you don't get a response in 1 second.
-            # periodSeconds: 10 # Probe frequency in seconds.
-            # failureThreshold: 2 # Probe declares failure after 2 attempts.
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: {{ .Values.containerPort }} 
+          readinessProbe:
+            httpGet:
+              path: /api/health/ready
+              port: {{ .Values.containerPort }} 
+            initialDelaySeconds: 10 # Start probing after 10 seconds of container creation.
+            timeoutSeconds: 1 # Timeout if you don't get a response in 1 second.
+            periodSeconds: 10 # Probe frequency in seconds.
+            failureThreshold: 2 # Probe declares failure after 2 attempts.
           resources:
             requests:
               memory: "128Mi"
