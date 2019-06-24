@@ -4,7 +4,7 @@ Skeleton sample project for a Docker container friendly ASP.NET core application
  - Helm chart for deployment on Kubernetes cluster
  - Mount HTTPS (TLS/SSL) certificate via volume and use it with Kestrel
  - Health endpoint for probes - used for warmup process and to determind if process is responsive
- - Gracefull shutdown with SIGTERM and SIGKILL - giving the application time to cleanup connections etc.
+ - Graceful shutdown with SIGTERM and SIGKILL - giving the application time to cleanup connections etc.
 
 # Install on Kubernetes cluster
 Assuming you have a cluster, kubectl and [helm](https://helm.sh) configured.
@@ -24,7 +24,7 @@ Assuming you have a cluster, kubectl and [helm](https://helm.sh) configured.
     ```
 
 # Step-by-step walk-through
-Clone this repo
+Clone this repository
 ## Built Docker image
 Run command in the directory where the Dockerfile is located
 ```bash
@@ -42,29 +42,51 @@ dotnet dev-certs https -v -ep .\HelmCharts\dotnetcoredocker\templates\_aspnetcor
 
 ### Try to run the container locally with self-signed certificate
 
-Thi is how we will run the container 
+This is how we will run the container 
 - exposing port 5000 & 5001- mount volumne .\HelmCharts\dotnetcoredocker\templates\ to /root/.dotnet/https
 - Set `Kestrel__Certificates__Default__Path` path to the certificate location
 - Set `Kestrel__Certificates__Default__Password` value of the password
-- mount volumne c:\cert\ to /root/.dotnet/https
+- mount volume with certificate to /root/.dotnet/https
 
 With the following command
 ```bash
-docker run 
+docker run --name myaspnetcorecontainer
     -p 5000:5000 -p 5001:5001 
-    -e Kestrel__Certificates__Default__Path=/root/.dotnet/https/aspnetcore-cert.pfx 
+    -e Kestrel__Certificates__Default__Path=/root/.dotnet/https/aspnetcore-cert.pfx
     -e Kestrel__Certificates__Default__Password=createyourownpassword 
     -v .\HelmCharts\dotnetcoredocker\templates\:/root/.dotnet/https 
     myaspnetcoreimage:v1
 ``` 
+> Expose both HTTP and HTTPS on non-standard ports. Because I can.
 
 ## Kubernetes liveness and readiness probes
-As a self-signed certificate is used, Kubernetes probes will fail, so the `app.UseHttpsRedirection()` is removed in the `Startup` class.
+A custom `HealthController` is used for health monitoring. You could use the build-in [health monitoring in ASP.NET Core](https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/health-checks?view=aspnetcore-2.2).
 
-## shutdown
-The default timeout is 5 seconds, but we can increase it by calling the [`UseShutdownTimeout`](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/web-host?view=aspnetcore-2.2#shutdown-timeout) extension method on the WebHostBuilder in our Program.Main() method or configuring with the environment variable `ASPNETCORE_SHUTDOWNTIMEOUTSECONDS`.
+>As a self-signed certificate is used, Kubernetes probes will fail, so the `app.UseHttpsRedirection()` is removed in the `Startup` class. Resulting in a HTTP request will not be redirected to HTTPS.
 
-https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/generic-host?view=aspnetcore-2.2#iapplicationlifetime-interface
+The Kubernetes deployment specifics the endpoints and ports
+```dockerfile
+livenessProbe:
+  httpGet:
+    path: /api/health
+    port: {{ .Values.containerPort }} 
+readinessProbe:
+  httpGet:
+    path: /api/health/ready
+    port: {{ .Values.containerPort }}
+```
+> The `{{ .Values.containerPort }}` variable is specified in the Helm values file.
+
+## Graceful shutdown
+Sometimes it is required to buy some time for shutdown of a process. Perhaps a transaction needs to be completed or a connections needs to be properly closed. That is why we need the ability to shutdown gracefully.
+
+ASP.NET Core exposes [application life-cycle events](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/generic-host?view=aspnetcore-2.2#iapplicationlifetime-interface).
+
+The `LifetimeEventsHostedService` class implements the ASP.NET Core application life-cycle events and simulates a process requiring extra time to shutdown.
+
+> The default allowed shutdown timeout is 5 seconds, but we can increase it by calling the [`UseShutdownTimeout`](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/web-host?view=aspnetcore-2.2#shutdown-timeout) extension method on the WebHostBuilder in our Program.Main() method or configuring with the environment variable `ASPNETCORE_SHUTDOWNTIMEOUTSECONDS`.
+
+
 
 
 # Gotchas
