@@ -1,4 +1,4 @@
-Skeleton sample project for a Docker container friendly ASP.NET core application
+Sample project for a Kubernetes friendly ASP.NET core application
  - Dockerfile using [Microsoft Container Registry (MCR)](https://azure.microsoft.com/en-us/blog/microsoft-syndicates-container-catalog/) base images
  - Dockerfile exposing both HTTP and HTTPS custom ports overwritten default [Kestrel settings](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/servers/kestrel?view=aspnetcore-2.2)
  - Helm chart for deployment on Kubernetes cluster
@@ -24,6 +24,27 @@ Assuming you have a cluster, kubectl and [helm](https://helm.sh) configured.
     ```bash
     curl --insecure -i https://<ip-address>/api/values
     ```
+    Replacing the `<ip-address>` with the external IP from the Kubernetes cluster. Check with command 
+    ```bash
+    helm status nameofdeployment
+    ```
+5. Kill the pod and observe the behavior
+    Observe the process will gracefully shutdown doing any clean-up before terminating. 
+
+    Observice the Pod logs with this command:
+    ```bash
+    kubectl logs --follow <name of the pod>
+    ```
+    > The Pod name will be something like `nameofdeployment-k8sfriendlyaspnetcore-bdfd6b6c7-cl6jm`. Check with helm status command as the previous step.
+
+    > Notice that you can see the Kubernetes health probes polling every few seconds.
+
+    Kill the Pod and watch the logs
+    ```bash
+    kubectl kill <name of the pod>
+    ```
+
+    > Kubernetes will automatically create a new Pod if it is terminated. Verify bu testing the endpoint with curl and check the helm status.
 
 # Details
 
