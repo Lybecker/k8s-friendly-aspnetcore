@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace dotnetcore_docker
+namespace Lybecker.K8sFriendlyAspNetCore
 {
     public class Startup
     {

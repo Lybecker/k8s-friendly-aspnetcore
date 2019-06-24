@@ -9,14 +9,16 @@ Skeleton sample project for a Docker container friendly ASP.NET core application
 # Test on Kubernetes cluster
 Assuming you have a cluster, kubectl and [helm](https://helm.sh) configured.
 
+> Execute the commands from the repository base folder.
+
 1. Clone this repository
 2. Generate self-signed certificate
     ```bash
-    dotnet dev-certs https -v -ep .\HelmCharts\dotnetcoredocker\templates\_aspnetcore-cert.pfx -p createyourownpassword
+    dotnet dev-certs https -v -ep .\helmchart\k8sfriendlyaspnetcore\templates\_aspnetcore-cert.pfx -p createyourownpassword
     ```
 3. Install via Helm
     ```bash
-    helm install helmchart\dotnetcoredocker\ --name nameofdeployment
+    helm install helmchart\k8sfriendlyaspnetcore\ --name nameofdeployment
     ```
 4. Test the endpoint
     ```bash
@@ -26,9 +28,9 @@ Assuming you have a cluster, kubectl and [helm](https://helm.sh) configured.
 # Details
 
 ## Built Docker image
-Run command in the directory where the Dockerfile is located
+Run command in the `src` folder where the Dockerfile is located
 ```bash
-docker build --tag myaspnetcoreimage:v1 .
+docker build --tag k8sfriendlyaspnetcore:v1 .
 ```
 
 > Requires [Docker installed and running](https://docs.docker.com/install/) locally
@@ -37,7 +39,7 @@ docker build --tag myaspnetcoreimage:v1 .
 Create a self-signed certificate and export it to a file:
 
 ```bash
-dotnet dev-certs https -v -ep .\HelmCharts\dotnetcoredocker\templates\_aspnetcore-cert.pfx -p createyourownpassword
+dotnet dev-certs https -v -ep .\HelmChart\k8sfriendlyaspnetcore\templates\_aspnetcore-cert.pfx -p createyourownpassword
 ```
 
 > The certificate is stored in the Helm templates folder, as Helm Charts does not currently support files as parameters (issue [#3276](https://github.com/helm/helm/issues/3276)).
@@ -48,16 +50,16 @@ This is how we will run the container
 - exposing port 5000 & 5001
 - Set `Kestrel__Certificates__Default__Path` path to the certificate location
 - Set `Kestrel__Certificates__Default__Password` value of the password
-- mount volume with certificate .\HelmCharts\dotnetcoredocker\templates\ to /root/.dotnet/https
+- mount volume with certificate .\HelmChart\k8sfriendlyaspnetcore\templates\ to /root/.dotnet/https
 
 With the following command
 ```bash
-docker run --name myaspnetcorecontainer
+docker run --name myk8sfriendlyaspnetcorecontainer
     -p 5000:5000 -p 5001:5001 
     -e Kestrel__Certificates__Default__Path=/root/.dotnet/https/aspnetcore-cert.pfx
     -e Kestrel__Certificates__Default__Password=createyourownpassword 
-    -v .\HelmCharts\dotnetcoredocker\templates\:/root/.dotnet/https 
-    myaspnetcoreimage:v1
+    -v .\HelmChart\k8sfriendlyaspnetcore\templates\:/root/.dotnet/https 
+    k8sfriendlyaspnetcore:v1
 ``` 
 > Expose both HTTP and HTTPS on non-standard ports. Normally port 80 and 443 is used. This is just to show what is required to use other ports.
 

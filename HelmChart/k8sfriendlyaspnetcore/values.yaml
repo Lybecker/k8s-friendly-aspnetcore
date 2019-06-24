@@ -10,7 +10,7 @@ containerPortHttps: 5001
 certificatePassword: "createyourownpassword"
 
 image:
-  repository: lybecker.azurecr.io/myaspnetcoreimage
+  repository: anderslybecker/k8sfriendlyaspnetcore
   tag: v1
   pullPolicy: IfNotPresent
 

@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace dotnetcore_docker.Controllers
+namespace Lybecker.K8sFriendlyAspNetCore.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

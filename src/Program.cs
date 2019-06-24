@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 
-namespace dotnetcore_docker
+namespace Lybecker.K8sFriendlyAspNetCore
 {
     public class Program
     {
