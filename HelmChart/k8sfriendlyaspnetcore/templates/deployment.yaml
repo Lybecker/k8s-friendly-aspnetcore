@@ -60,7 +60,7 @@ spec:
           - name: MyVar
             value: "blah"
           - name: Kestrel__Certificates__Default__Path
-            value: /root/.dotnet/https/aspnetcore-cert.pfx
+            value: /certs/aspnetcore-cert.pfx
           - name: Kestrel__Certificates__Default__Password
             valueFrom:
               secretKeyRef:
@@ -68,7 +68,7 @@ spec:
                 key: certificatePassword
           volumeMounts:
           - name: certificatesvolume
-            mountPath: /root/.dotnet/https/aspnetcore-cert.pfx
+            mountPath: /certs/aspnetcore-cert.pfx
             subPath: aspnetcore-cert.pfx
             readOnly: true
       volumes:
