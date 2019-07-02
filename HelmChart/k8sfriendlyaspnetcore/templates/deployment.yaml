@@ -16,6 +16,11 @@ spec:
         app.kubernetes.io/name: {{ include "DotNetCoreDocker.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
     spec:
+      securityContext:
+        # runAsUser: 1000
+        # runAsGroup: 1000
+        # fsGroup: 1000
+        allowPrivilegeEscalation: false
     {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}

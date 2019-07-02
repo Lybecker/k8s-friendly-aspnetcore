@@ -6,6 +6,7 @@ Sample project for a Kubernetes friendly ASP.NET core application
  - Health endpoint for probes - used for warmup process and to determind if process is responsive
  - Graceful shutdown with SIGTERM and SIGKILL - giving the application time to cleanup connections etc.
  - Specify the compute resources needed to run and maximum consumption
+ - Execute as unprivileged account
 
 # Test on Kubernetes cluster
 Assuming you have a cluster, kubectl and [helm](https://helm.sh) configured.
@@ -20,6 +21,10 @@ Assuming you have a cluster, kubectl and [helm](https://helm.sh) configured.
 3. Install via Helm
     ```bash
     helm install helmchart\k8sfriendlyaspnetcore\ --name nameofdeployment
+    ```
+    The Kubernetes deployment will use image [anderslybecker/k8sfriendlyaspnetcore](https://hub.docker.com/r/anderslybecker/k8sfriendlyaspnetcore) from Docker Hub. Overwrite like this:
+    ```bash
+    helm install helmchart\k8sfriendlyaspnetcore\ --name nameofdeployment --set image.repository <image name>
     ```
 4. Test the endpoint
     ```bash
@@ -76,7 +81,7 @@ This is how we will run the container
 
 With the following command
 ```bash
-docker run --name mmyk8sfriendlyaspnetcorecontainer 
+docker run --name myk8sfriendlyaspnetcorecontainer 
     -p 5000:5000 -p 5001:5001 
     -e Kestrel__Certificates__Default__Path=/root/.dotnet/https/_aspnetcore-cert.pfx 
     -e Kestrel__Certificates__Default__Password=createyourownpassword 
@@ -85,7 +90,7 @@ docker run --name mmyk8sfriendlyaspnetcorecontainer
 ``` 
 > Mounting a volume on Windows does not allow usage of relative paths. Modify the volume mount path to e.g. `c:\Code\k8s-friendly-aspnetcore\HelmChart\k8sfriendlyaspnetcore\templates\`
 
-> Expose both HTTP and HTTPS on non-standard ports. Normally port 80 and 443 is used. This is just to show what is required to use other ports.
+> Expose both HTTP and HTTPS on non-standard ports. Normally port 80 and 443 is used, but running the ASP.NET process as an unprivileged non-root account requires to use ports above 1024.
 
 ## Kubernetes liveness and readiness probes
 A custom `HealthController` is used for health monitoring. You could use the build-in [health monitoring in ASP.NET Core](https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/health-checks?view=aspnetcore-2.2).
@@ -104,6 +109,8 @@ readinessProbe:
     port: {{ .Values.containerPort }}
 ```
 > The `{{ .Values.containerPort }}` variable is specified in the Helm values file.
+
+See [Kubernetes deployment example](/HelmChart/k8sfriendlyaspnetcore/templates/deployment.yaml).
 
 ## Graceful shutdown
 Sometimes it is required to buy some time for shutdown of a process. Perhaps a transaction needs to be completed or a connections needs to be properly closed. That is why we need the ability to shutdown gracefully.
@@ -126,6 +133,90 @@ resources:
     memory: "256Mi"
     cpu: "500m"
 ```
+See [Kubernetes deployment example](/HelmChart/k8sfriendlyaspnetcore/templates/deployment.yaml).
+
+## Execute as unprivileged account
+By default a Docker container runs as root user (id: 0), which means the app inside the container can do anything inside the container. To adhere to the principle of least privilege, the app running insinde the container should be running in the context of an unprivileged non-root account.
+
+To test if a container can run without any issues as an an unprivileged non-root account, try to run it with a random user ID (not 0 as it is root). It does not matter if the user ID exists on the host or in the container. It will override settings inside the `Dockerfile`:
+
+```bash
+docker run --user $((RANDOM+1)) <YOUR CONTAINER>
+```
+
+For at ASP.NET application an user with at least execute permissions is needed to execute the application.
+Create the user like this in the `Dockerfile`:
+
+```dockerfile
+RUN groupadd -r grp &&\
+    useradd -r -g grp -d /home/app -s /sbin/nologin -c "Docker image user" app
+```
+-r creates a [system account](https://linux.die.net/man/8/useradd).
+
+By default a new user ID is created the system assigns the next available ID from the range of user IDs specified in the `login.defs` file.
+
+If you want to reference the user and group ID in the Kubernetes Security Context, then specify the IDs:
+```dockerfile
+RUN groupadd -r 999 grp &&\
+    useradd -r -u 999 -g grp -d /home/app -s /sbin/nologin -c "Docker image user" app
+```
+
+After copying the files into the container, assign ownership to both the user and group [recursively](https://linux.die.net/man/1/chown) (-R)
+```dockerfile
+RUN chown -R app:grp /home/app/my-project
+```
+
+A complete Dockerfile looks like this:
+```dockerfile
+FROM mcr.microsoft.com/dotnet/core/aspnet:2.2
+
+# Declare ports to be used
+ENV ASPNETCORE_URLS http://+:5000;https://+:5001
+EXPOSE 5000
+EXPOSE 5001
+
+ENV USERNAME=appuser
+ENV GROUP=grp
+ENV HOME=/home/${USERNAME}
+
+RUN mkdir -p ${HOME}
+
+# Create a group and an user (system account) which will execute the app
+RUN groupadd -r ${GROUP} &&\
+    useradd -r -g ${GROUP} -d ${HOME} -s /sbin/nologin -c "Docker image user" ${USERNAME}
+
+# Setup the app directory
+ENV APP_HOME=${HOME}/app
+RUN mkdir ${APP_HOME}
+WORKDIR ${APP_HOME}
+
+# Copy in the application code
+ADD . ${APP_HOME}
+
+# Grant ownership of everything in the app directory
+RUN chown -R ${USERNAME}:${GROUP} ${APP_HOME}
+
+# Change the context to the app user
+USER ${USERNAME}
+
+ENTRYPOINT ["dotnet", "k8s-friendly-aspnetcore.dll"]
+```
+See an example of a [multi-stage build Dockerfile](/src/Dockerfile).
+
+> A unprivileged none-root account cannot bind to ports below 1024, hence the default HTTP port 80 og HTTPS port 443 cannot be used.
+
+In Kubernetes the Security Context controls how a Pod is excecuted. The Security Context can be configured both at Pod and Container level [Configure a Security Context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/).
+
+```dockerfile
+securityContext:
+  runAsUser: 999
+  runAsGroup: 999
+  allowPrivilegeEscalation: false
+```
+See [Kubernetes deployment example](/HelmChart/k8sfriendlyaspnetcore/templates/deployment.yaml).
+
+
+ `runAsUser` and `runAsGroup` option to specify the Linux user and group executing the process. It overrides the `USER` instruction of the `Dockerfile`. `AllowPrivilegeEscalation` controls whether a process can gain more privileges than its parent process.
 
 # Gotchas
 - The base image from Microsoft Container Registry sets listen to port 80, but can be overwritten by setting `ASPNETCORE_URLS` environment variable in the Dockerfile
@@ -142,3 +233,4 @@ resources:
  - [Managing ASP.NET Core App Settings on Kubernetes](https://anthonychu.ca/post/aspnet-core-appsettings-secrets-kubernetes/)
  - [Health checks in ASP.NET Core](https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/health-checks?view=aspnetcore-2.2)
  - [Graceful termination in Kubernetes with ASP.NET Core](https://blog.markvincze.com/graceful-termination-in-kubernetes-with-asp-net-core/#comment-4509101865)
+ - [Understanding how uid and gid work in Docker containers](https://medium.com/@mccode/understanding-how-uid-and-gid-work-in-docker-containers-c37a01d01cf)
