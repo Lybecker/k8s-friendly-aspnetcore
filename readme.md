@@ -83,12 +83,12 @@ With the following command
 ```bash
 docker run --name myk8sfriendlyaspnetcorecontainer 
     -p 5000:5000 -p 5001:5001 
-    -e Kestrel__Certificates__Default__Path=/root/.dotnet/https/_aspnetcore-cert.pfx 
+    -e Kestrel__Certificates__Default__Path=/certs/_aspnetcore-cert.pfx 
     -e Kestrel__Certificates__Default__Password=createyourownpassword 
-    -v .\HelmChart\k8sfriendlyaspnetcore\templates\:/root/.dotnet/https 
+    -v .\HelmChart\k8sfriendlyaspnetcore\templates\:/certs 
     anderslybecker/k8sfriendlyaspnetcore:v1
 ``` 
-> Mounting a volume on Windows does not allow usage of relative paths. Modify the volume mount path to e.g. `c:\Code\k8s-friendly-aspnetcore\HelmChart\k8sfriendlyaspnetcore\templates\`
+> Mounting a volume on Windows does not allow usage of relative paths. Modify the volume mount path to e.g. `c:\code\k8s-friendly-aspnetcore\HelmChart\k8sfriendlyaspnetcore\templates\`
 
 > Expose both HTTP and HTTPS on non-standard ports. Normally port 80 and 443 is used, but running the ASP.NET process as an unprivileged non-root account requires to use ports above 1024.
 
@@ -161,16 +161,11 @@ RUN groupadd -r 999 grp &&\
     useradd -r -u 999 -g grp -d /home/app -s /sbin/nologin -c "Docker image user" app
 ```
 
-After copying the files into the container, assign ownership to both the user and group [recursively](https://linux.die.net/man/1/chown) (-R)
-```dockerfile
-RUN chown -R app:grp /home/app/my-project
-```
-
 A complete Dockerfile looks like this:
 ```dockerfile
 FROM mcr.microsoft.com/dotnet/core/aspnet:2.2
 
-# Declare ports to be used
+# Declare ports above 1024 as an unprivileged non-root user cannot bind to > 1024
 ENV ASPNETCORE_URLS http://+:5000;https://+:5001
 EXPOSE 5000
 EXPOSE 5001
@@ -192,9 +187,6 @@ WORKDIR ${APP_HOME}
 
 # Copy in the application code
 ADD . ${APP_HOME}
-
-# Grant ownership of everything in the app directory
-RUN chown -R ${USERNAME}:${GROUP} ${APP_HOME}
 
 # Change the context to the app user
 USER ${USERNAME}
