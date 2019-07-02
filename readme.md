@@ -52,6 +52,11 @@ Assuming you have a cluster, kubectl and [helm](https://helm.sh) configured.
 
     > Kubernetes will automatically create a new Pod if it is terminated. Verify bu testing the endpoint with curl and check the helm status.
 
+To remoce and purge the helm installation from the Kubernetes cluster run:
+```bash
+helm del --purge nameofdeployment
+```
+
 # Details
 
 ## Built Docker image
