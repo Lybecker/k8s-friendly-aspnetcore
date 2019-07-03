@@ -120,7 +120,7 @@ See [Kubernetes deployment example](/HelmChart/k8sfriendlyaspnetcore/templates/d
 ## Graceful shutdown
 Sometimes it is required to buy some time for shutdown of a process. Perhaps a transaction needs to be completed or a connections needs to be properly closed. That is why we need the ability to shutdown gracefully.
 
-ASP.NET Core exposes [application life-cycle events](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/generic-host?view=aspnetcore-2.2#iapplicationlifetime-interface) for this purpose.
+ASP.NET Core exposes [application life-cycle events](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/generic-host?view=aspnetcore-2.2#iapplicationlifetime-interface) for this purpose. For .NET Core 3.0 the application life-cycle events class used in previous verison [IApplicationLifetime](https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.hosting.iapplicationlifetime?view=aspnetcore-2.2) is depricated and you should use [IHostApplicationLifetime](https://docs.microsoft.com/en-us/dotnet/api/microsoft.extensions.hosting.ihostapplicationlifetime?view=aspnetcore-3.0). It is just a drop-in replacement in the [`LifetimeEventsHostedService`](/src/LifetimeEventsHostedService.cs.cs) file.
 
 The `LifetimeEventsHostedService` class implements the ASP.NET Core application life-cycle events and simulates a process requiring extra time to shutdown.
 
