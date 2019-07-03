@@ -126,7 +126,7 @@ The `LifetimeEventsHostedService` class implements the ASP.NET Core application 
 
 > The default allowed shutdown timeout is 5 seconds, but we can increase it by calling the [`UseShutdownTimeout`](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/web-host?view=aspnetcore-2.2#shutdown-timeout) extension method on the WebHostBuilder in Program.Main() method or configuring with the environment variable `ASPNETCORE_SHUTDOWNTIMEOUTSECONDS`.
 
-For .NET Core 3.0 the application life-cycle events class used in previous verison [IApplicationLifetime](https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.hosting.iapplicationlifetime?view=aspnetcore-2.2) is depricated and you should use [IHostApplicationLifetime](https://docs.microsoft.com/en-us/dotnet/api/microsoft.extensions.hosting.ihostapplicationlifetime?view=aspnetcore-3.0). It is just a drop-in replacement in the [`LifetimeEventsHostedService`](/src/LifetimeEventsHostedService.cs) file.
+For .NET Core 3.0 the application life-cycle events class used in previous verison [IApplicationLifetime](https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.hosting.iapplicationlifetime?view=aspnetcore-2.2) is depricated and you should use [IHostApplicationLifetime](https://docs.microsoft.com/en-us/dotnet/api/microsoft.extensions.hosting.ihostapplicationlifetime?view=aspnetcore-3.0). It is just a drop-in replacement in the [`LifetimeEventsHostedService`](/src/LifetimeEventsHostedService.cs#L11) file.
 
 ## Compute resources needed and maximum
 In the deployment file, the requested and maximum compute resources are specified:
