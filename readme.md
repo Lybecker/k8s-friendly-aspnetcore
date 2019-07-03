@@ -126,6 +126,19 @@ The `LifetimeEventsHostedService` class implements the ASP.NET Core application 
 
 > The default allowed shutdown timeout is 5 seconds, but we can increase it by calling the [`UseShutdownTimeout`](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/web-host?view=aspnetcore-2.2#shutdown-timeout) extension method on the WebHostBuilder in Program.Main() method or configuring with the environment variable `ASPNETCORE_SHUTDOWNTIMEOUTSECONDS`.
 
+> The default max grace termination period for a Kubernetes Pod is 30 sec. But it can be changed via the terminationGracePeriodSeconds setting.
+
+### Kubernetes termination lifecycle
+How the Kubernetes termination lifecycle works:
+
+1. Pod is set to the “Terminating” State and removed from the endpoints list of all Services
+2. [preStop](https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/) Hook is executed 
+3. SIGTERM signal is sent to the pod
+4. Kubernetes waits for a grace period
+5. SIGKILL signal is sent to pod, and the pod is removed
+
+### .NET Core 3.0 changes
+
 For .NET Core 3.0 the application life-cycle events class used in previous verison [IApplicationLifetime](https://docs.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.hosting.iapplicationlifetime?view=aspnetcore-2.2) is depricated and you should use [IHostApplicationLifetime](https://docs.microsoft.com/en-us/dotnet/api/microsoft.extensions.hosting.ihostapplicationlifetime?view=aspnetcore-3.0). It is just a drop-in replacement in the [`LifetimeEventsHostedService`](/src/LifetimeEventsHostedService.cs#L11) file.
 
 ## Compute resources needed and maximum
