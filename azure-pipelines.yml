@@ -18,18 +18,35 @@ variables:
   # imageRepository: '{{#toAlphaNumericString imageRepository 50}}{{/toAlphaNumericString}}'
   # containerRegistry: '{{ containerRegistryConnection.Authorization.Parameters.loginServer }}'
   tag: '$(Build.BuildId)'
+  csprojPath: '/src/k8s-friendly-aspnetcore.csproj'
 
 steps:
 - task: NuGetToolInstaller@0
 
-- task: NuGetCommand@2
+- task: DotNetCoreCLI@2
+  displayName: dotnet restore
   inputs:
-    restoreSolution: '$(solution)'
+    command: 'restore'
+    projects: $(csprojPath)
+
+- task: DotNetCoreCLI@2
+  displayName: dotnet build
+  inputs:
+    command: 'build'
+    projects: $(csprojPath)
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'publish'
+    publishWebProjects: false
+    projects: $(csprojPath)
+    arguments: '-c Release -o /app'
+    zipAfterPublish: false
 
 - task: Bash@3
   inputs:
     targetType: 'inline'
-    script: dotnet restore "./src/k8s-friendly-aspnetcore.csproj"
+    script: dotnet restore "/src/k8s-friendly-aspnetcore.csproj"
 
 - task: Bash@3
   inputs:
@@ -40,3 +57,5 @@ steps:
   inputs:
     targetType: 'inline'
     script: docker build -t anderslybecker/fisk:$(tag) .
+
+
