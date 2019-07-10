@@ -29,12 +29,12 @@ steps:
 - task: Bash@3
   inputs:
     targetType: 'inline'
-    script: dotnet restore "./k8s-friendly-aspnetcore.csproj"
+    script: dotnet restore "./src/k8s-friendly-aspnetcore.csproj"
 
 - task: Bash@3
   inputs:
     targetType: 'inline'
-    script: dotnet publish "k8s-friendly-aspnetcore.csproj" -c Release -o /app
+    script: dotnet publish "./src/k8s-friendly-aspnetcore.csproj" -c Release -o /app
 
 - task: Bash@3
   inputs:
