@@ -44,19 +44,10 @@ steps:
     arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)'
     zipAfterPublish: True
 
-- task: Bash@3
+- task: Docker@2
   inputs:
-    targetType: 'inline'
-    script: dotnet restore "/src/k8s-friendly-aspnetcore.csproj"
-
-- task: Bash@3
-  inputs:
-    targetType: 'inline'
-    script: dotnet publish "./src/k8s-friendly-aspnetcore.csproj" -c Release -o /app
-
-- task: Bash@3
-  inputs:
-    targetType: 'inline'
-    script: docker build -t anderslybecker/fisk:$(tag) .
-
-
+    containerRegistry: 'Lybecker Docker Hub'
+    repository: 'fisk123'
+    command: 'buildAndPush'
+    Dockerfile: '**/Dockerfile'
+    tags: '$(tag)'
