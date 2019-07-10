@@ -49,5 +49,5 @@ steps:
     containerRegistry: 'Lybecker Docker Hub'
     repository: 'fisk123'
     command: 'buildAndPush'
-    Dockerfile: '**/Dockerfile'
-    tags: '$(tag)'
+    Dockerfile: '**/SimpleDockerfile'
+    tags: '$(tag)'  
