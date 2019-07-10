@@ -47,7 +47,7 @@ steps:
 - task: Docker@2
   inputs:
     containerRegistry: 'Lybecker Docker Hub'
-    repository: 'fisk123'
+    repository: 'anderslybecker/buuh'
     command: 'buildAndPush'
     Dockerfile: '**/SimpleDockerfile'
     tags: '$(tag)'  
