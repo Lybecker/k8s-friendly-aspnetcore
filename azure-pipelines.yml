@@ -41,3 +41,11 @@ steps:
     command: 'buildAndPush'
     Dockerfile: '**/SimpleDockerfile'
     tags: '$(tag)'
+
+- task: Docker@2
+  inputs:
+    command: 'buildAndPush'
+    Dockerfile: '**/Dockerfile'
+    tags: |
+      $(Build.BuildId)
+      latest
