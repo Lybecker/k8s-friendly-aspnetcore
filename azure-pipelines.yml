@@ -26,16 +26,17 @@ steps:
   inputs:
     restoreSolution: '$(solution)'
 
-- task: VSBuild@1
+- task: Bash@3
   inputs:
-    solution: '$(solution)'
-    msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:DesktopBuildPackageLocation="$(build.artifactStagingDirectory)\WebApp.zip" /p:DeployIisAppPath="Default Web Site"'
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
+    targetType: 'inline'
+    script: dotnet restore "./k8s-friendly-aspnetcore.csproj"
 
-- task: VSTest@2
+- task: Bash@3
   inputs:
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
+    targetType: 'inline'
+    script: dotnet publish "k8s-friendly-aspnetcore.csproj" -c Release -o /app
 
-- script: docker build -t anderslybecker/fisk:$(tag) .
+- task: Bash@3
+  inputs:
+    targetType: 'inline'
+    script: docker build -t anderslybecker/fisk:$(tag) .
