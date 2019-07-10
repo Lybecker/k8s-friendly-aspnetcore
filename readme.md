@@ -8,6 +8,8 @@ Sample project for a Kubernetes friendly ASP.NET core application
  - Specify the compute resources needed to run and maximum consumption
  - Execute as unprivileged account
 
+[![Build Status](https://lybecker.visualstudio.com/Microsoft/_apis/build/status/Lybecker.k8s-friendly-aspnetcore?branchName=master)](https://lybecker.visualstudio.com/Microsoft/_build/latest?definitionId=23&branchName=master)
+
 # Test on Kubernetes cluster
 Assuming you have a cluster, kubectl and [helm](https://helm.sh) configured.
 
