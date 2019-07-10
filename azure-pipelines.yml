@@ -18,7 +18,7 @@ variables:
   # imageRepository: '{{#toAlphaNumericString imageRepository 50}}{{/toAlphaNumericString}}'
   # containerRegistry: '{{ containerRegistryConnection.Authorization.Parameters.loginServer }}'
   tag: '$(Build.BuildId)'
-  csprojPath: '/src/*.csproj'
+  projects: 'src/*.csproj'
 
 steps:
 - task: NuGetToolInstaller@0
@@ -27,19 +27,19 @@ steps:
   displayName: dotnet restore
   inputs:
     command: 'restore'
-    projects: $(csprojPath)
+    projects: $(projects)
 
 - task: DotNetCoreCLI@2
   displayName: dotnet build
   inputs:
     command: 'build'
-    projects: $(csprojPath)
+    projects: $(projects)
 
 - task: DotNetCoreCLI@2
   inputs:
     command: 'publish'
     publishWebProjects: false
-    projects: $(csprojPath)
+    projects: $(projects)
     arguments: '-c Release -o /app'
     zipAfterPublish: false
 
