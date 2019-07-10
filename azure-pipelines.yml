@@ -13,10 +13,6 @@ variables:
   solution: '**/*.sln'
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
-  # Container registry service connection established during pipeline creation
-  # dockerRegistryServiceConnection: '{{ containerRegistryConnection.Id }}'
-  # imageRepository: '{{#toAlphaNumericString imageRepository 50}}{{/toAlphaNumericString}}'
-  # containerRegistry: '{{ containerRegistryConnection.Authorization.Parameters.loginServer }}'
   tag: '$(Build.BuildId)'
   projects: 'src/*.csproj'
 
@@ -50,4 +46,4 @@ steps:
     repository: 'anderslybecker/buuh'
     command: 'buildAndPush'
     Dockerfile: '**/SimpleDockerfile'
-    tags: '$(tag)'  
+    tags: '$(tag)'
