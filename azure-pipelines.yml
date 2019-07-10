@@ -24,24 +24,25 @@ steps:
 - task: NuGetToolInstaller@0
 
 - task: DotNetCoreCLI@2
-  displayName: dotnet restore
+  displayName: 'dotnet restore'
   inputs:
     command: 'restore'
     projects: $(projects)
 
 - task: DotNetCoreCLI@2
-  displayName: dotnet build
+  displayName: 'dotnet build'
   inputs:
     command: 'build'
     projects: $(projects)
 
 - task: DotNetCoreCLI@2
+  displayName: 'dotnet publish'
   inputs:
     command: 'publish'
     publishWebProjects: false
     projects: $(projects)
-    arguments: '-c Release -o /app'
-    zipAfterPublish: false
+    arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)'
+    zipAfterPublish: True
 
 - task: Bash@3
   inputs:
