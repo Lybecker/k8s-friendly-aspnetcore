@@ -75,11 +75,12 @@ steps:
     artifact: 'drop2'
 
 - task: Docker@2
+  displayName: 'Docker build & push'
   inputs:
     containerRegistry: 'Lybecker Docker Hub'
     repository: 'anderslybecker/k8sfriendlyaspnetcore'
     command: 'buildAndPush'
     Dockerfile: '**/SimpleDockerfile'
-    buildContext: '$(build.artifactstagingdirectory)'
+    buildContext: '$(build.artifactstagingdirectory)/src/'
     tags: |
       $(imgTage)
