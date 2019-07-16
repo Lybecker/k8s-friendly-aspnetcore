@@ -52,6 +52,13 @@ stages:
         ArtifactName: 'drop'
         publishLocation: 'Container'
 
+
+  - job: CreateDockerImage
+    displayName: Create Docker image
+    pool: 'Hosted Ubuntu 1604'
+    dependsOn: BuildAndTestSolutionAndPublishBuildArtifacts
+
+    steps:
     - task: Docker@2
       displayName: 'Docker build & push'
       inputs:
