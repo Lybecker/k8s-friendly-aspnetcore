@@ -45,12 +45,18 @@ stages:
         arguments: '--configuration $(BuildConfiguration) --no-build --output $(build.artifactstagingdirectory)'
         zipAfterPublish: false
 
-    - task: PublishBuildArtifacts@1
+    - task: PublishPipelineArtifact@1
       displayName: 'Publish Build Artifacts'
       inputs:
-        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-        ArtifactName: 'drop'
-        publishLocation: 'Container'
+        path: $(build.artifactstagingdirectory)
+        artifact: drop
+
+    # - task: PublishBuildArtifacts@1
+    #   displayName: 'Publish Build Artifacts'
+    #   inputs:
+    #     PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    #     ArtifactName: 'drop'
+    #     publishLocation: 'Container'
 
 
   - job: CreateDockerImage
@@ -59,6 +65,10 @@ stages:
     dependsOn: BuildAndTestSolutionAndPublishBuildArtifacts
 
     steps:
+    - task: DownloadPipelineArtifact@2
+      displayName: 'Download Build Artifacts'
+      inputs:
+        artifact: drop
     - task: Docker@2
       displayName: 'Docker build & push'
       inputs:
