@@ -69,6 +69,10 @@ stages:
       displayName: 'Download Build Artifacts'
       inputs:
         artifact: drop
+    - task: PublishPipelineArtifact@1
+      inputs:
+        targetPath: '$(Pipeline.Workspace)'
+        artifact: 'all'
     - task: Docker@2
       displayName: 'Docker build & push'
       inputs:
