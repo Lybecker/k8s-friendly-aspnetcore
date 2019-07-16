@@ -45,6 +45,12 @@ stages:
         arguments: '--configuration $(BuildConfiguration) --no-build --output $(build.artifactstagingdirectory)'
         zipAfterPublish: false
 
+    - task: PublishPipelineArtifact@1
+      displayName: 'Publish Build Artifacts'
+      inputs:
+        path: $(build.artifactstagingdirectory)
+        artifact: drop
+
     - task: DotNetCoreCLI@2
       displayName: 'dotnet publish'
       inputs:
@@ -57,8 +63,8 @@ stages:
     - task: PublishPipelineArtifact@1
       displayName: 'Publish Build Artifacts'
       inputs:
-        path: $(build.artifactstagingdirectory)
-        artifact: drop
+        path: 'publish/'
+        artifact: publish
 
     # - task: PublishBuildArtifacts@1
     #   displayName: 'Publish Build Artifacts'
