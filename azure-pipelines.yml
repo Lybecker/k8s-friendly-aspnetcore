@@ -42,6 +42,17 @@ steps:
     arguments: '--configuration $(BuildConfiguration) --no-restore --output $(build.artifactstagingdirectory)'
     zipAfterPublish: false
 
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'
+
+- task: PublishPipelineArtifact@1
+  inputs:
+    targetPath: '$(Pipeline.Workspace)'
+    artifact: 'drop2'
+
 - task: Docker@2
   inputs:
     containerRegistry: 'Lybecker Docker Hub'
@@ -49,4 +60,5 @@ steps:
     command: 'buildAndPush'
     Dockerfile: '**/SimpleDockerfile'
     buildContext: '$(build.artifactstagingdirectory)'
-    tags: '$(tag)'
+    tags: |
+      '$(tag)'
