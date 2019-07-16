@@ -54,5 +54,4 @@ steps:
     command: 'buildAndPush'
     Dockerfile: '**/SimpleDockerfile'
     buildContext: '$(build.artifactstagingdirectory)'
-    tags: |
-      $(imageTag)
+    tags: $(imageTag)
