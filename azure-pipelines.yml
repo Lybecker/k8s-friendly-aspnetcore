@@ -95,7 +95,7 @@ stages:
         containerRegistry: 'Lybecker Docker Hub'
         repository: 'anderslybecker/k8sfriendlyaspnetcore'
         command: 'buildAndPush'
-        Dockerfile: 'src/SimpleDockerfile'
-        buildContext: 'src/'
+        Dockerfile: '$(Pipeline.Workspace)/src/SimpleDockerfile'
+        buildContext: '$(Pipeline.Workspace)/downloads/src/'
         tags: |
           $(imgTage)
