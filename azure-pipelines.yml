@@ -24,6 +24,7 @@ steps:
   inputs:
     command: 'build'
     projects: $(projects)
+    arguments: '--configuration $(BuildConfiguration) --no-restore'
 
 - task: DotNetCoreCLI@2
   inputs:
@@ -37,8 +38,14 @@ steps:
     command: 'publish'
     publishWebProjects: false
     projects: $(projects)
-    arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)'
+    arguments: '--configuration $(BuildConfiguration) --no-restore --output $(build.artifactstagingdirectory)'
     zipAfterPublish: false
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'
 
 - task: Docker@2
   inputs:
@@ -47,4 +54,5 @@ steps:
     command: 'buildAndPush'
     Dockerfile: '**/SimpleDockerfile'
     buildContext: '$(build.artifactstagingdirectory)'
-    tags: '$(tag)'
+    tags: |
+      $(imageTag)
