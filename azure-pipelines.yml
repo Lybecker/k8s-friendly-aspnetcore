@@ -34,14 +34,32 @@ steps:
     projects: '**/*Tests/*.csproj'
     arguments: '--configuration $(BuildConfiguration) --no-restore --logger "trx;LogFileName=$(testResultsFilename)"'
 
+- task: CmdLine@2
+  displayName: 'pwd'
+  inputs:
+    script: 'pwd'
+- task: CmdLine@2
+  displayName: 'ls curent'
+  inputs:
+    script: 'ls'
+- task: CmdLine@2
+  displayName: 'ls artifactstagingdirectory'
+  inputs:
+    script: 'ls $(build.artifactstagingdirectory)'
+
 - task: DotNetCoreCLI@2
   displayName: 'dotnet publish'
   inputs:
     command: 'publish'
     publishWebProjects: false
     projects: $(projects)
-    arguments: '--configuration $(BuildConfiguration) --no-restore --output $(build.artifactstagingdirectory)'
+    arguments: '--configuration $(BuildConfiguration) --no-build --output $(build.artifactstagingdirectory)'
     zipAfterPublish: false
+
+- task: CmdLine@2
+  displayName: 'ls artifactstagingdirectory'
+  inputs:
+    script: 'ls $(build.artifactstagingdirectory)'
 
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Build Artifacts'
