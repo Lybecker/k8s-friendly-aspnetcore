@@ -57,13 +57,13 @@ stages:
         command: 'publish'
         publishWebProjects: false
         projects: $(projects)
-        arguments: '--configuration $(BuildConfiguration) --no-build --output publish/'
+        arguments: '--configuration $(BuildConfiguration) --no-build --output /publish/'
         zipAfterPublish: false        
 
     - task: PublishPipelineArtifact@1
       displayName: 'Publish Build Artifacts'
       inputs:
-        path: 'publish/'
+        path: '/publish/'
         artifact: publish
 
     # - task: PublishBuildArtifacts@1
