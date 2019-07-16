@@ -7,7 +7,7 @@ pool:
 variables:
   solution: '**/*.sln'
   buildConfiguration: 'Release'
-  tag: '$(Build.BuildId)'
+  imgTage: '$(Build.BuildId)'
   projects: 'src/*.csproj'
   testResultsFilename: 'TestResults.trx'
 
@@ -61,4 +61,4 @@ steps:
     Dockerfile: '**/SimpleDockerfile'
     buildContext: '$(build.artifactstagingdirectory)'
     tags: |
-      '$(tag)'
+      $(imgTage)
