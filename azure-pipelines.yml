@@ -80,6 +80,6 @@ stages:
         repository: 'anderslybecker/k8sfriendlyaspnetcore'
         command: 'buildAndPush'
         Dockerfile: 'src/SimpleDockerfile'
-        buildContext: '$(build.artifactstagingdirectory)/src/'
+        buildContext: 'src/'
         tags: |
           $(imgTage)
