@@ -56,7 +56,7 @@ steps:
     containerRegistry: 'Lybecker Docker Hub'
     repository: 'anderslybecker/k8sfriendlyaspnetcore'
     command: 'buildAndPush'
-    Dockerfile: 'SimpleDockerfile'
+    Dockerfile: 'src/SimpleDockerfile'
     buildContext: '$(build.artifactstagingdirectory)/src/'
     tags: |
       $(imgTage)
