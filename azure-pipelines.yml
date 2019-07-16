@@ -46,13 +46,5 @@ steps:
     repository: 'anderslybecker/k8sfriendlyaspnetcore'
     command: 'buildAndPush'
     Dockerfile: '**/SimpleDockerfile'
-    tags: '$(tag)'
-
-- task: Docker@2
-  inputs:
-    command: 'buildAndPush'
-    Dockerfile: '**/Dockerfile'
     buildContext: '$(build.artifactstagingdirectory)'
-    tags: |
-      $(Build.BuildId)
-      latest
+    tags: '$(tag)'
