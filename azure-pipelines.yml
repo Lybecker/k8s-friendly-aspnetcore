@@ -9,6 +9,7 @@ variables:
   buildConfiguration: 'Release'
   tag: '$(Build.BuildId)'
   projects: 'src/*.csproj'
+  testResultsFilename: 'TestResults.trx'
 
 steps:
 - task: NuGetToolInstaller@0
@@ -24,12 +25,13 @@ steps:
   inputs:
     command: 'build'
     projects: $(projects)
+    arguments: '--configuration $(BuildConfiguration) --no-restore'
 
 - task: DotNetCoreCLI@2
   inputs:
     command: 'test'
     projects: '**/*Tests/*.csproj'
-    arguments: '--configuration $(buildConfiguration)'
+    arguments: '--configuration $(BuildConfiguration) --no-restore --logger "trx;LogFileName=$(testResultsFilename)"'
 
 - task: DotNetCoreCLI@2
   displayName: 'dotnet publish'
@@ -37,7 +39,7 @@ steps:
     command: 'publish'
     publishWebProjects: false
     projects: $(projects)
-    arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)'
+    arguments: '--configuration $(BuildConfiguration) --no-restore --output $(build.artifactstagingdirectory)'
     zipAfterPublish: false
 
 - task: Docker@2
