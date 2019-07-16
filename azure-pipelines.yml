@@ -9,7 +9,6 @@ variables:
   buildConfiguration: 'Release'
   imgTage: '$(Build.BuildId)'
   projects: '**/*.csproj'
-  testResultsFilename: 'TestResults.trx'
 
 steps:
 - task: NuGetToolInstaller@0
@@ -35,19 +34,6 @@ steps:
     arguments: '--configuration $(BuildConfiguration) --no-restore'
     publishTestResults: true
 
-- task: CmdLine@2
-  displayName: 'pwd'
-  inputs:
-    script: 'pwd'
-- task: CmdLine@2
-  displayName: 'ls curent'
-  inputs:
-    script: 'ls'
-- task: CmdLine@2
-  displayName: 'ls artifactstagingdirectory'
-  inputs:
-    script: 'ls $(build.artifactstagingdirectory)'
-
 - task: DotNetCoreCLI@2
   displayName: 'dotnet publish'
   inputs:
@@ -57,22 +43,12 @@ steps:
     arguments: '--configuration $(BuildConfiguration) --no-build --output $(build.artifactstagingdirectory)'
     zipAfterPublish: false
 
-- task: CmdLine@2
-  displayName: 'ls artifactstagingdirectory'
-  inputs:
-    script: 'ls $(build.artifactstagingdirectory)'
-
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Build Artifacts'
   inputs:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)'
     ArtifactName: 'drop'
     publishLocation: 'Container'
-
-- task: PublishPipelineArtifact@1
-  inputs:
-    targetPath: '$(Pipeline.Workspace)'
-    artifact: 'drop2'
 
 - task: Docker@2
   displayName: 'Docker build & push'
