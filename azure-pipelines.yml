@@ -38,7 +38,7 @@ steps:
     publishWebProjects: false
     projects: $(projects)
     arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)'
-    zipAfterPublish: True
+    zipAfterPublish: false
 
 - task: Docker@2
   inputs:
