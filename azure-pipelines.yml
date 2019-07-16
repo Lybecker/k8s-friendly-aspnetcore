@@ -52,6 +52,7 @@ steps:
   inputs:
     command: 'buildAndPush'
     Dockerfile: '**/Dockerfile'
+    buildContext: '$(build.artifactstagingdirectory)'
     tags: |
       $(Build.BuildId)
       latest
