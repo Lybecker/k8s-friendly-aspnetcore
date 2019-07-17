@@ -42,7 +42,7 @@ stages:
         command: 'publish'
         publishWebProjects: false
         projects: $(projects)
-        arguments: '--configuration $(BuildConfiguration) --no-build --output $(build.artifactstagingdirectory)'
+        arguments: '--configuration $(BuildConfiguration) --no-build --output $(build.artifactstagingdirectory)' # could use Build.BinariesDirectory as output
         zipAfterPublish: false
 
     - task: PublishPipelineArtifact@1
@@ -50,7 +50,6 @@ stages:
       inputs:
         path: $(build.artifactstagingdirectory)
         artifact: drop
-# could use Build.BinariesDirectory
 
     - task: DotNetCoreCLI@2
       displayName: 'dotnet publish'
@@ -67,56 +66,32 @@ stages:
         path: '/publish/'
         artifact: publish
 
-    # - task: PublishBuildArtifacts@1
-    #   displayName: 'Publish Build Artifacts'
-    #   inputs:
-    #     PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-    #     ArtifactName: 'drop'
-    #     publishLocation: 'Container'
-
 
   - job: CreateDockerImage
     displayName: Create Docker image
     pool: 'Hosted Ubuntu 1604'
     dependsOn: BuildAndTestSolutionAndPublishBuildArtifacts
+    condition: eq(variables['Build.SourceBranch'], 'refs/heads/master') # if master branch
 
     steps:
     - task: DownloadPipelineArtifact@2
       displayName: 'Download Build Artifacts'
       inputs:
         artifact: drop
-        targetPath: '$(Build.SourcesDirectory)/downloads' 
+        targetPath: '$(Build.SourcesDirectory)/publish'
+
     - task: PublishPipelineArtifact@1
       inputs:
         targetPath: '$(Pipeline.Workspace)'
         artifact: 'all'
-    - task: Bash@3
-      displayName: 'ls $(Build.SourcesDirectory)'
-      inputs:
-        targetType: 'inline'
-        script: ls $(Build.SourcesDirectory)
-    - task: Bash@3
-      displayName: 'ls $(Agent.BuildDirectory)'
-      inputs:
-        targetType: 'inline'
-        script: ls $(Agent.BuildDirectory)
-    - task: Bash@3
-      displayName: 'ls $(Agent.WorkFolder)'
-      inputs:
-        targetType: 'inline'
-        script: ls $(Agent.WorkFolder)
-    - task: Bash@3
-      displayName: 'ls $(System.DefaultWorkingDirectory)'
-      inputs:
-        targetType: 'inline'
-        script: ls $(System.DefaultWorkingDirectory)
+
     - task: Docker@2
       displayName: 'Docker build & push'
       inputs:
         containerRegistry: 'Lybecker Docker Hub'
         repository: 'anderslybecker/k8sfriendlyaspnetcore'
         command: 'buildAndPush'
-        Dockerfile: '/src/SimpleDockerfile'
-        buildContext: '/downloads/src/'
+        Dockerfile: '$(Build.SourcesDirectory)/src/SimpleDockerfile'
+        buildContext: '$(Build.SourcesDirectory)/publish/src/'
         tags: |
           $(imgTage)
