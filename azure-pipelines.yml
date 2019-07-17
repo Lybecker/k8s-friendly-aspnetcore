@@ -84,7 +84,7 @@ stages:
       displayName: 'Download Build Artifacts'
       inputs:
         artifact: drop
-        targetPath: '$(Pipeline.Workspace)/downloads' 
+        targetPath: '$/downloads' 
     - task: PublishPipelineArtifact@1
       inputs:
         targetPath: '$(Pipeline.Workspace)'
@@ -95,7 +95,7 @@ stages:
         containerRegistry: 'Lybecker Docker Hub'
         repository: 'anderslybecker/k8sfriendlyaspnetcore'
         command: 'buildAndPush'
-        Dockerfile: '$(Pipeline.Workspace)/src/SimpleDockerfile'
-        buildContext: '$(Pipeline.Workspace)/downloads/src/'
+        Dockerfile: '/src/SimpleDockerfile'
+        buildContext: '/downloads/src/'
         tags: |
           $(imgTage)
