@@ -9,7 +9,7 @@ stages:
   displayName: Service CI/CD
   jobs:
   - job: BuildAndTestSolutionAndPublishBuildArtifacts
-    displayName: Build and test solution, publish artifacts, and build and push Docker image
+    displayName: Build and test solution and publish artifacts
     pool: 'Hosted Ubuntu 1604'
 
     steps:
@@ -65,26 +65,28 @@ stages:
       inputs:
         path: '/publish/'
         artifact: publish
-
+    - task: PublishPipelineArtifact@1
+      inputs:
+        targetPath: '$(Pipeline.Workspace)'
+        artifact: 'allBefore'
 
   - job: CreateDockerImage
-    displayName: Create Docker image
+    displayName: Build and Push Docker image
     pool: 'Hosted Ubuntu 1604'
     dependsOn: BuildAndTestSolutionAndPublishBuildArtifacts
     condition: eq(variables['Build.SourceBranch'], 'refs/heads/master') # if master branch
 
     steps:
-    - task: DownloadPipelineArtifact@2
-      displayName: 'Download Build Artifacts'
-      inputs:
-        artifact: drop
-        targetPath: '$(Build.SourcesDirectory)/publish'
-
+    # - task: DownloadPipelineArtifact@2
+    #   displayName: 'Download Build Artifacts'
+    #   inputs:
+    #     artifact: drop
+    #     targetPath: '$(Build.SourcesDirectory)/publish'
     - task: PublishPipelineArtifact@1
       inputs:
         targetPath: '$(Pipeline.Workspace)'
-        artifact: 'all'
-
+        artifact: 'allAfter'
+        
     - task: Docker@2
       displayName: 'Docker build & push'
       inputs:
