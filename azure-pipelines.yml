@@ -50,6 +50,7 @@ stages:
       inputs:
         path: $(build.artifactstagingdirectory)
         artifact: drop
+# could use Build.BinariesDirectory
 
     - task: DotNetCoreCLI@2
       displayName: 'dotnet publish'
@@ -84,11 +85,31 @@ stages:
       displayName: 'Download Build Artifacts'
       inputs:
         artifact: drop
-        targetPath: '/downloads' 
+        targetPath: '$(Build.SourcesDirectory)/downloads' 
     - task: PublishPipelineArtifact@1
       inputs:
         targetPath: '$(Pipeline.Workspace)'
         artifact: 'all'
+    - task: Bash@3
+      displayName: 'ls $(Build.SourcesDirectory)'
+      inputs:
+        targetType: 'inline'
+        script: ls $(Build.SourcesDirectory)
+    - task: Bash@3
+      displayName: 'ls $(Agent.BuildDirectory)'
+      inputs:
+        targetType: 'inline'
+        script: ls $(Agent.BuildDirectory)
+    - task: Bash@3
+      displayName: 'ls $(Agent.WorkFolder)'
+      inputs:
+        targetType: 'inline'
+        script: ls $(Agent.WorkFolder)
+    - task: Bash@3
+      displayName: 'ls $(System.DefaultWorkingDirectory)'
+      inputs:
+        targetType: 'inline'
+        script: ls $(System.DefaultWorkingDirectory)
     - task: Docker@2
       displayName: 'Docker build & push'
       inputs:
