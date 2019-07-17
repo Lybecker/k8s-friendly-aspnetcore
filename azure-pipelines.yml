@@ -84,7 +84,7 @@ stages:
       displayName: 'Download Build Artifacts'
       inputs:
         artifact: drop
-        targetPath: '$/downloads' 
+        targetPath: '/downloads' 
     - task: PublishPipelineArtifact@1
       inputs:
         targetPath: '$(Pipeline.Workspace)'
