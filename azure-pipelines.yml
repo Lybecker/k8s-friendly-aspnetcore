@@ -51,25 +51,6 @@ stages:
         path: $(build.artifactstagingdirectory)
         artifact: drop
 
-    - task: DotNetCoreCLI@2
-      displayName: 'dotnet publish'
-      inputs:
-        command: 'publish'
-        publishWebProjects: false
-        projects: $(projects)
-        arguments: '--configuration $(BuildConfiguration) --no-build --output /publish/'
-        zipAfterPublish: false        
-
-    - task: PublishPipelineArtifact@1
-      displayName: 'Publish Build Artifacts'
-      inputs:
-        path: '/publish/'
-        artifact: publish
-    - task: PublishPipelineArtifact@1
-      inputs:
-        targetPath: '$(Pipeline.Workspace)'
-        artifact: 'allBefore'
-
   - job: CreateDockerImage
     displayName: Build and Push Docker image
     pool: 'Hosted Ubuntu 1604'
@@ -77,16 +58,12 @@ stages:
     condition: eq(variables['Build.SourceBranch'], 'refs/heads/master') # if master branch
 
     steps:
-    # - task: DownloadPipelineArtifact@2
-    #   displayName: 'Download Build Artifacts'
-    #   inputs:
-    #     artifact: drop
-    #     targetPath: '$(Build.SourcesDirectory)/publish'
-    - task: PublishPipelineArtifact@1
+    - task: DownloadPipelineArtifact@2
+      displayName: 'Download Build Artifacts'
       inputs:
-        targetPath: '$(Pipeline.Workspace)'
-        artifact: 'allAfter'
-        
+        artifact: drop
+        targetPath: '$(Build.SourcesDirectory)/publish'
+
     - task: Docker@2
       displayName: 'Docker build & push'
       inputs:
