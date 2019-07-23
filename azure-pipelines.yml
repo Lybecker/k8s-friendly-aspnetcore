@@ -1,50 +1,76 @@
-trigger:
-- master
-
-pool:
-  vmImage: 'ubuntu-latest'
-
 variables:
   solution: '**/*.sln'
   buildConfiguration: 'Release'
-  tag: '$(Build.BuildId)'
-  projects: 'src/*.csproj'
+  imgTage: '$(Build.BuildId)'
+  projects: '**/*.csproj'
 
-steps:
-- task: NuGetToolInstaller@0
+stages:
+- stage: ServiceCICD
+  displayName: Service CI/CD
+  jobs:
+  - job: BuildAndTestSolutionAndPublishBuildArtifacts
+    displayName: Build and test solution and publish artifacts
+    pool: 'Hosted Ubuntu 1604'
 
-- task: DotNetCoreCLI@2
-  displayName: 'dotnet restore'
-  inputs:
-    command: 'restore'
-    projects: $(projects)
+    steps:
+    - task: NuGetToolInstaller@0
 
-- task: DotNetCoreCLI@2
-  displayName: 'dotnet build'
-  inputs:
-    command: 'build'
-    projects: $(projects)
+    - task: DotNetCoreCLI@2
+      displayName: 'dotnet restore'
+      inputs:
+        command: 'restore'
+        projects: $(projects)
 
-- task: DotNetCoreCLI@2
-  inputs:
-    command: 'test'
-    projects: '**/*Tests/*.csproj'
-    arguments: '--configuration $(buildConfiguration)'
+    - task: DotNetCoreCLI@2
+      displayName: 'dotnet build'
+      inputs:
+        command: 'build'
+        projects: $(projects)
+        arguments: '--configuration $(BuildConfiguration) --no-restore'
 
-- task: DotNetCoreCLI@2
-  displayName: 'dotnet publish'
-  inputs:
-    command: 'publish'
-    publishWebProjects: false
-    projects: $(projects)
-    arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)'
-    zipAfterPublish: false
+    - task: DotNetCoreCLI@2
+      displayName: 'dotnet test'
+      inputs:
+        command: 'test'
+        projects: '**/*Tests/*.csproj'
+        arguments: '--configuration $(BuildConfiguration) --no-build'
+        publishTestResults: true
 
-- task: Docker@2
-  inputs:
-    containerRegistry: 'Lybecker Docker Hub'
-    repository: 'anderslybecker/k8sfriendlyaspnetcore'
-    command: 'buildAndPush'
-    Dockerfile: '**/SimpleDockerfile'
-    buildContext: '$(build.artifactstagingdirectory)'
-    tags: '$(tag)'
+    - task: DotNetCoreCLI@2
+      displayName: 'dotnet publish'
+      inputs:
+        command: 'publish'
+        publishWebProjects: false
+        projects: $(projects)
+        arguments: '--configuration $(BuildConfiguration) --no-build --output $(build.artifactstagingdirectory)' # could use Build.BinariesDirectory as output
+        zipAfterPublish: false
+
+    - task: PublishPipelineArtifact@1
+      displayName: 'Publish Build Artifacts'
+      inputs:
+        path: $(build.artifactstagingdirectory)
+        artifact: drop
+
+  - job: CreateDockerImage
+    displayName: Build and Push Docker image
+    pool: 'Hosted Ubuntu 1604'
+    dependsOn: BuildAndTestSolutionAndPublishBuildArtifacts
+    condition: eq(variables['Build.SourceBranch'], 'refs/heads/master') # if master branch
+
+    steps:
+    - task: DownloadPipelineArtifact@2
+      displayName: 'Download Build Artifacts'
+      inputs:
+        artifact: drop
+        targetPath: '$(Build.SourcesDirectory)/publish'
+
+    - task: Docker@2
+      displayName: 'Docker build & push'
+      inputs:
+        containerRegistry: 'Lybecker Docker Hub'
+        repository: 'anderslybecker/k8sfriendlyaspnetcore'
+        command: 'buildAndPush'
+        Dockerfile: '$(Build.SourcesDirectory)/src/SimpleDockerfile'
+        buildContext: '$(Build.SourcesDirectory)/publish/src/'
+        tags: |
+          $(imgTage)
