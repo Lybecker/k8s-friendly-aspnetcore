@@ -233,7 +233,7 @@ See [Kubernetes deployment example](/HelmChart/k8sfriendlyaspnetcore/templates/d
  `runAsUser` and `runAsGroup` option to specify the Linux user and group executing the process. It overrides the `USER` instruction of the `Dockerfile`. `AllowPrivilegeEscalation` controls whether a process can gain more privileges than its parent process.
 
 ### Alpine linux
-To use the the Alpine-based Docker image available for .NET Core a small changes has to be applied, as the functions for adding users and groups has different names.
+To use the the [Alpine-based Docker image](https://hub.docker.com/_/microsoft-dotnet-core-aspnet/) available for .NET Core a small changes has to be applied, as the functions for adding users and groups has different names.
 
 ```dockerfile
 RUN addgroup -S ${GROUP} && adduser -S ${USERNAME} -G ${GROUP} -h ${HOME} -s /sbin/nologin
@@ -241,7 +241,7 @@ RUN addgroup -S ${GROUP} && adduser -S ${USERNAME} -G ${GROUP} -h ${HOME} -s /sb
 
 See the [SimpleDockerfile.Alpine](/src/SimpleDockerfile.Alpine) file for a complete example.
 
-> It is possible to use the Alpine Guest user (UID 405), if you do not want to create your own.
+> It is possible to use the Alpine Guest user (id: 405), if you do not want to create your own.
 
 # Gotchas
 - The base image from Microsoft Container Registry sets listen to port 80, but can be overwritten by setting `ASPNETCORE_URLS` environment variable in the Dockerfile
