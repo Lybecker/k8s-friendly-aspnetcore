@@ -1,0 +1,32 @@
+FROM mcr.microsoft.com/dotnet/core/aspnet:2.2-alpine3.9
+
+# Declare ports above 1024 as an unprivileged non-root user cannot bind to > 1024
+ENV ASPNETCORE_URLS http://+:5000;https://+:5001
+EXPOSE 5000
+EXPOSE 5001
+
+ENV USERNAME=appuser
+ENV GROUP=grp
+ENV HOME=/home/${USERNAME}
+
+RUN mkdir -p ${HOME}
+
+# Create a group and an user (system account) which will execute the app
+# Alpine uses addgroup and adduser and not groupadd and useradd
+RUN addgroup -S ${GROUP} && adduser -S ${USERNAME} -G ${GROUP} -h ${HOME} -s /sbin/nologin
+
+# Setup the app directory
+ENV APP_HOME=${HOME}/app
+RUN mkdir ${APP_HOME}
+WORKDIR ${APP_HOME}
+
+# Copy in the application code
+ADD . ${APP_HOME}
+
+# Change the context to the app user
+USER ${USERNAME}
+
+# Alpine docker image doesn't have bash installed by default.
+#RUN apk add --no-cache bash
+
+ENTRYPOINT ["dotnet", "k8s-friendly-aspnetcore.dll"]
