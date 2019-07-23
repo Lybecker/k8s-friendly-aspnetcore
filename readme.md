@@ -239,11 +239,9 @@ To use the the Alpine-based Docker image available for .NET Core a small changes
 RUN addgroup -S ${GROUP} && adduser -S ${USERNAME} -G ${GROUP} -h ${HOME} -s /sbin/nologin
 ```
 
-See the [SimpleDockerfile.Alpine](src\SimpleDockerfile.Alpine) file for a complete example.
+See the [SimpleDockerfile.Alpine](/src/SimpleDockerfile.Alpine) file for a complete example.
 
 > It is possible to use the Alpine Guest user (UID 405), if you do not want to create your own.
-
-
 
 # Gotchas
 - The base image from Microsoft Container Registry sets listen to port 80, but can be overwritten by setting `ASPNETCORE_URLS` environment variable in the Dockerfile

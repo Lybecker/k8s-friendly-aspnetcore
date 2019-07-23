@@ -20,7 +20,6 @@ spec:
         # runAsUser: 1000
         # runAsGroup: 1000
         # fsGroup: 1000
-        allowPrivilegeEscalation: false
     {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
@@ -30,6 +29,8 @@ spec:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          securityContext:
+            allowPrivilegeEscalation: false
           ports:
             - name: http
               containerPort:  {{ .Values.containerPort }} 
