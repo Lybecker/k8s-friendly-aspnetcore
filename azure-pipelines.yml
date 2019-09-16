@@ -3,6 +3,7 @@ variables:
   buildConfiguration: 'Release'
   imgTage: '$(Build.BuildId)'
   projects: '**/*.csproj'
+  name: assemblyVersion : '1.0.0'
 
 stages:
 - stage: ServiceCICD
@@ -26,7 +27,7 @@ stages:
       inputs:
         command: 'build'
         projects: $(projects)
-        arguments: '--configuration $(BuildConfiguration) --no-restore'
+        arguments: '--configuration $(BuildConfiguration) --no-restore /p:Version=$(assemblyVersion).$(imgTage)'
 
     - task: DotNetCoreCLI@2
       displayName: 'dotnet test'
