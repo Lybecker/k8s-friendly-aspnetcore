@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Lybecker.K8sFriendlyAspNetCore.Models;
 
 namespace Lybecker.K8sFriendlyAspNetCore.Controllers
 {
@@ -11,14 +12,20 @@ namespace Lybecker.K8sFriendlyAspNetCore.Controllers
         [Route("ready")]
         public IActionResult Ready()
         {
-            return Ok("Yes, ready now");
+            return Ok(new HealthEndpointResponse
+            { 
+                Message = "Yes. Ready now."
+            });
         }
 
         // Check that the ASP.NET runtime responds
         [HttpGet]
         public IActionResult Alive()
         {
-            return Ok("Alive. All is well.");
+            return Ok(new HealthEndpointResponse
+            { 
+                Message = "Alive. All is well."
+            });
         }
     }
 }
