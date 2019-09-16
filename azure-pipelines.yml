@@ -3,7 +3,7 @@ variables:
   buildConfiguration: 'Release'
   imgTage: '$(Build.BuildId)'
   projects: '**/*.csproj'
-  name: assemblyVersion : '1.0.0'
+  assemblyVersion : '1.0.0'
 
 stages:
 - stage: ServiceCICD
