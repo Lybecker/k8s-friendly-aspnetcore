@@ -27,7 +27,7 @@ stages:
       inputs:
         command: 'build'
         projects: $(projects)
-        arguments: '--configuration $(BuildConfiguration) --no-restore /p:Version=$(assemblyVersion).$(imgTage)'
+        arguments: '--configuration $(BuildConfiguration) --no-restore /p:AssemblyVersion=$(assemblyVersion).$(imgTage)'
 
     - task: DotNetCoreCLI@2
       displayName: 'dotnet test'
