@@ -30,14 +30,14 @@ jobs:
           name: files
           path: publish/
       - name: Docker Login
-        if: $BUILDDOCKER_CONDITION
+        if: ${{ BUILDDOCKER_CONDITION }}
         uses: Azure/docker-login@v1
         with:
 #          login-server: myregistry.azurecr.io 
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_PASSWORD }}
       - name: Build and push Docker image
-        if: $BUILDDOCKER_CONDITION
+        if: ${{ BUILDDOCKER_CONDITION }}
         env:
           DOCKERCONTEXT: 'publish/'
           DOCKERFILE: 'src/SimpleDockerfile'
