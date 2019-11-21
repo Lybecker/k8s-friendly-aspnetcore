@@ -21,7 +21,7 @@ jobs:
       - name: dotnet test
         run: dotnet test $sourceFolder --configuration Release --no-build
       - name: dotnet publish
-        run: dotnet publish $sourceFolder --configuration Release --no-build #--output /out
+        run: dotnet publish $sourceFolder --configuration Release --no-build --output {$GITHUB_WORKSPACE}/publish
       - name: Docker publish
         uses: elgohr/Publish-Docker-Github-Action@2.8
         with:
