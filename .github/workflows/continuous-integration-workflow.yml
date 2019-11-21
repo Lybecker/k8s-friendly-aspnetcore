@@ -27,6 +27,15 @@ jobs:
         with:
           name: files
           path: publish/
+      - name: Docker Login
+        uses: Azure/docker-login@v1
+        with:
+          login-server: hub.docker.com
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_PASSWORD }}
+      - run: |
+          docker build publish/ -f src/SimpleDockerfile -t anderslybecker/k8sfriendlyaspnetcore:${{ assemblyVersion }}
+          docker push anderslybecker/k8sfriendlyaspnetcore:${{ assemblyVersion }}
 #      - name: Docker publish
 #        uses: elgohr/Publish-Docker-Github-Action@2.8
 #        with:
