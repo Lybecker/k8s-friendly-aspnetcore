@@ -37,9 +37,9 @@ jobs:
       - name: Build and push Docker image
         if: github.ref == 'refs/heads/master'
         env:
-          DOCKER_CONTEXT: publish/
-          DOCKERFILE: src/SimpleDockerfile
-          DOCKER_IMAGE: anderslybecker/k8sfriendlyaspnetcore
+          DOCKER_CONTEXT: 'publish/'
+          DOCKERFILE: 'src/SimpleDockerfile'
+          DOCKER_IMAGE: 'anderslybecker/k8sfriendlyaspnetcore'
         run: |
           docker build $DOCKER_CONTEXT -f $DOCKERFILE -t $DOCKER_IMAGE:$assemblyVersion
           docker push $DOCKER_IMAGE:$assemblyVersion
