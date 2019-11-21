@@ -35,7 +35,5 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_PASSWORD }}
           dockerfile: src/Dockerfile
-          # Use workdir when you would like to change the directory for building
-#          workdir: # optional
-          # Use buildargs when you want to pass a list of environment variables as build-args
-#          tag_names: # optional
+          workdir: src/bin/Release/netcoreapp2.2/publish/
+          tag_names: latest, $assemblyVersion
