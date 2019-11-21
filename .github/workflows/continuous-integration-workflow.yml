@@ -3,7 +3,7 @@ on: [push, pull_request]
 
 jobs:
   buildJob:
-    name: Greeting
+    name: Compile and test
     runs-on: ubuntu-latest
     env:
       sourceFolder: src/
@@ -20,5 +20,17 @@ jobs:
         run: dotnet build $sourceFolder --configuration Release /p:Version=$assemblyVersion --no-restore
       - name: dotnet test
         run: dotnet test $sourceFolder --configuration Release --no-build
-#      - name: dotnet publish
-#        run: dotnet publish $sourceFolder --configuration Release --no-build --output /out
+      - name: dotnet publish
+        run: dotnet publish $sourceFolder --configuration Release --no-build #--output /out
+      - name: Docker publish
+        uses: elgohr/Publish-Docker-Github-Action@2.8
+        with:
+          # The name of the image you would like to push
+          name: anderslybecker/k8sfriendlyaspnetcore
+#          username: 
+#          password: 
+          dockerfile: src/Dockerfile
+          # Use workdir when you would like to change the directory for building
+#          workdir: # optional
+          # Use buildargs when you want to pass a list of environment variables as build-args
+#          tag_names: # optional
