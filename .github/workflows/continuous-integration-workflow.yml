@@ -21,19 +21,19 @@ jobs:
       - name: dotnet test
         run: dotnet test $sourceFolder --configuration Release --no-build
       - name: dotnet publish
-        run: dotnet publish $sourceFolder --configuration Release --no-build
+        run: dotnet publish $sourceFolder --configuration Release --no-build --out ${{ GITHUB_WORKSPACE }}/publish
       - name: Upload artifact
         uses: actions/upload-artifact@v1.0.0
         with:
           name: files
-          path: src/bin/Release/netcoreapp2.2/publish/
-      - name: Docker publish
-        uses: elgohr/Publish-Docker-Github-Action@2.8
-        with:
-          # The name of the image you would like to push
-          name: anderslybecker/k8sfriendlyaspnetcore
-          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-          password: ${{ secrets.DOCKER_HUB_PASSWORD }}
-          dockerfile: src/SimpleDockerfile
-          workdir: src/bin/Release/netcoreapp2.2/publish/
-          tag_names: latest, $assemblyVersion
+          path: ${{ GITHUB_WORKSPACE }}/publish
+#      - name: Docker publish
+#        uses: elgohr/Publish-Docker-Github-Action@2.8
+#        with:
+#          # The name of the image you would like to push
+#          name: anderslybecker/k8sfriendlyaspnetcore
+#          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+#          password: ${{ secrets.DOCKER_HUB_PASSWORD }}
+#          dockerfile: src/SimpleDockerfile
+#          workdir: src/bin/Release/netcoreapp2.2/publish/
+#          tag_names: latest, $assemblyVersion
