@@ -6,8 +6,8 @@ jobs:
     name: Compile, test & Dockerize
     runs-on: ubuntu-latest
     env:
-      sourceFolder: src/
-      assemblyVersion: 1.0.0
+      PROJECTFOLDER: 'src/'
+      ASSEMBLY_VERSION: '1.0.0'
     steps:
       - uses: actions/checkout@v1
       - name: Setup .NET Core
@@ -15,13 +15,13 @@ jobs:
         with:
           dotnet-version: 2.2.108
       - name: dotnet restore
-        run: dotnet restore $sourceFolder
+        run: dotnet restore $PROJECTFOLDER
       - name: dotnet build
-        run: dotnet build $sourceFolder --configuration Release /p:Version=$assemblyVersion --no-restore
+        run: dotnet build $PROJECTFOLDER --configuration Release /p:Version=$ASSEMBLY_VERSION --no-restore
       - name: dotnet test
-        run: dotnet test $sourceFolder --configuration Release --no-build
+        run: dotnet test $PROJECTFOLDER --configuration Release --no-build
       - name: dotnet publish
-        run: dotnet publish $sourceFolder --configuration Release --no-build --output $GITHUB_WORKSPACE/publish/
+        run: dotnet publish $PROJECTFOLDER --configuration Release --no-build --output $GITHUB_WORKSPACE/publish/
       - name: Upload artifact
         uses: actions/upload-artifact@v1.0.0
         with:
@@ -41,16 +41,5 @@ jobs:
           DOCKERFILE: 'src/SimpleDockerfile'
           DOCKERIMAGE: 'anderslybecker/k8sfriendlyaspnetcore'
         run: |
-          docker build $DOCKERCONTEXT -f $DOCKERFILE -t $DOCKERIMAGE:$assemblyVersion
-          docker push $DOCKERIMAGE:$assemblyVersion     
-          
-#      - name: Docker publish
-#        uses: elgohr/Publish-Docker-Github-Action@2.8
-#        with:
-#          # The name of the image you would like to push
-#          name: anderslybecker/k8sfriendlyaspnetcore
-#          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-#          password: ${{ secrets.DOCKER_HUB_PASSWORD }}
-#          dockerfile: src/SimpleDockerfile
-#          workdir: src/bin/Release/netcoreapp2.2/publish/
-#          tag_names: latest, $assemblyVersion
+          docker build $DOCKERCONTEXT -f $DOCKERFILE -t $DOCKERIMAGE:$ASSEMBLY_VERSION
+          docker push $DOCKERIMAGE:$ASSEMBLY_VERSION
