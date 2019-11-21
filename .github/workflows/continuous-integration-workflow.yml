@@ -41,9 +41,9 @@ jobs:
           DOCKERFILE: 'src/SimpleDockerfile'
           DOCKER_IMAGE: 'anderslybecker/k8sfriendlyaspnetcore'
         run: |
-          docker build publish/ -f $DOCKERFILE -t $DOCKER_IMAGE:$assemblyVersion
-          docker push $DOCKER_IMAGE:$assemblyVersion
-        
+          docker build publish/ -f src/SimpleDockerfile -t anderslybecker/k8sfriendlyaspnetcore:$assemblyVersion
+          docker push anderslybecker/k8sfriendlyaspnetcore:$assemblyVersion        
+          
 #      - name: Docker publish
 #        uses: elgohr/Publish-Docker-Github-Action@2.8
 #        with:
