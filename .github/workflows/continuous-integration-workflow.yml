@@ -38,10 +38,11 @@ jobs:
         if: github.ref == 'refs/heads/master'
         env:
           DOCKERCONTEXT: 'publish/'
-          DOCKER_IMAGE: 'anderslybecker/k8sfriendlyaspnetcore'
+          DOCKERFILE: 'src/SimpleDockerfile'
+          DOCKERIMAGE: 'anderslybecker/k8sfriendlyaspnetcore'
         run: |
-          docker build $DOCKERCONTEXT -f src/SimpleDockerfile -t $DOCKER_IMAGE:$assemblyVersion
-          docker push $DOCKER_IMAGE:$assemblyVersion     
+          docker build $DOCKERCONTEXT -f $DOCKERFILE -t $DOCKERIMAGE:$assemblyVersion
+          docker push $DOCKERIMAGE:$assemblyVersion     
           
 #      - name: Docker publish
 #        uses: elgohr/Publish-Docker-Github-Action@2.8
