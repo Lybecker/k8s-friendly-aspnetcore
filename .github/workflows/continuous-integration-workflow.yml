@@ -13,3 +13,10 @@ jobs:
           dotnet-version: 2.2.108
       - name: Build with dotnet
         run: dotnet build src/ --configuration Release
+      - name: Upload artifact
+        uses: actions/upload-artifact@v1.0.0
+        with:
+          # Artifact name
+          name: binaries
+          # Directory containing files to upload
+          path: drop
