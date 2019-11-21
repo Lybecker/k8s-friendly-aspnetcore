@@ -34,15 +34,9 @@ jobs:
 #          login-server: myregistry.azurecr.io 
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_PASSWORD }}
-      - name: Build and push Docker image
-        if: github.ref == 'refs/heads/master'
-        env:
-          DOCKER_CONTEXT: 'publish/'
-          DOCKERFILE: 'src/SimpleDockerfile'
-          DOCKER_IMAGE: 'anderslybecker/k8sfriendlyaspnetcore'
-        run: |
+      - run: |
           docker build publish/ -f src/SimpleDockerfile -t anderslybecker/k8sfriendlyaspnetcore:$assemblyVersion
-          docker push anderslybecker/k8sfriendlyaspnetcore:$assemblyVersion        
+          docker push anderslybecker/k8sfriendlyaspnetcore:$assemblyVersion     
           
 #      - name: Docker publish
 #        uses: elgohr/Publish-Docker-Github-Action@2.8
