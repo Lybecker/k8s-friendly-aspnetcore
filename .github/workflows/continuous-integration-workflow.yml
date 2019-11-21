@@ -32,8 +32,8 @@ jobs:
         with:
           # The name of the image you would like to push
           name: anderslybecker/k8sfriendlyaspnetcore
-          username: anderslybecker
-#          password: 
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_PASSWORD }}
           dockerfile: src/Dockerfile
           # Use workdir when you would like to change the directory for building
 #          workdir: # optional
