@@ -30,7 +30,7 @@ jobs:
       - name: Docker Login
         uses: Azure/docker-login@v1
         with:
-          login-server: hub.docker.com
+#          login-server: myregistry.azurecr.io 
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_PASSWORD }}
       - run: |
