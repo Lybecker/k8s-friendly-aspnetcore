@@ -40,7 +40,7 @@ jobs:
           DOCKERCONTEXT: 'publish/'
           DOCKER_IMAGE: 'anderslybecker/k8sfriendlyaspnetcore'
         run: |
-          docker build $DOCKER_CONTEXT -f src/SimpleDockerfile -t $DOCKER_IMAGE:$assemblyVersion
+          docker build $DOCKERCONTEXT -f src/SimpleDockerfile -t $DOCKER_IMAGE:$assemblyVersion
           docker push $DOCKER_IMAGE:$assemblyVersion     
           
 #      - name: Docker publish
