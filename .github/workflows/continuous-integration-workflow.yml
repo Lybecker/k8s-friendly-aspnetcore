@@ -34,6 +34,6 @@ jobs:
           name: anderslybecker/k8sfriendlyaspnetcore
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_PASSWORD }}
-          dockerfile: src/Dockerfile
+          dockerfile: src/SimpleDockerfile
           workdir: src/bin/Release/netcoreapp2.2/publish/
           tag_names: latest, $assemblyVersion
