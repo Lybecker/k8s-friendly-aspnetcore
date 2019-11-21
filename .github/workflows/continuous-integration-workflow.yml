@@ -21,12 +21,12 @@ jobs:
       - name: dotnet test
         run: dotnet test $sourceFolder --configuration Release --no-build
       - name: dotnet publish
-        run: dotnet publish $sourceFolder --configuration Release --no-build --out ${{ GITHUB_WORKSPACE }}/publish
+        run: dotnet publish $sourceFolder --configuration Release --no-build --out $GITHUB_WORKSPACE/publish
       - name: Upload artifact
         uses: actions/upload-artifact@v1.0.0
         with:
           name: files
-          path: ${{ GITHUB_WORKSPACE }}/publish
+          path: $GITHUB_WORKSPACE/publish
 #      - name: Docker publish
 #        uses: elgohr/Publish-Docker-Github-Action@2.8
 #        with:
