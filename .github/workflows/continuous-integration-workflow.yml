@@ -8,6 +8,7 @@ jobs:
     env:
       PROJECTFOLDER: 'src/'
       ASSEMBLY_VERSION: '1.0.0'
+      CONFIGURATION: Release
     steps:
       - uses: actions/checkout@v1
       - name: Setup .NET Core
@@ -17,11 +18,11 @@ jobs:
       - name: dotnet restore
         run: dotnet restore $PROJECTFOLDER
       - name: dotnet build
-        run: dotnet build $PROJECTFOLDER --configuration Release /p:Version=$ASSEMBLY_VERSION --no-restore
+        run: dotnet build $PROJECTFOLDER --configuration $CONFIGURATION /p:Version=$ASSEMBLY_VERSION --no-restore
       - name: dotnet test
-        run: dotnet test $PROJECTFOLDER --configuration Release --no-build
+        run: dotnet test $PROJECTFOLDER --configuration $CONFIGURATION --no-build
       - name: dotnet publish
-        run: dotnet publish $PROJECTFOLDER --configuration Release --no-build --output $GITHUB_WORKSPACE/publish/
+        run: dotnet publish $PROJECTFOLDER --configuration $CONFIGURATION --no-build --output $GITHUB_WORKSPACE/publish/
       - name: Upload artifact
         uses: actions/upload-artifact@v1.0.0
         with:
