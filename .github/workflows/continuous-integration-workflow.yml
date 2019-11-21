@@ -2,7 +2,7 @@ name: CI
 on: [push, pull_request]
 
 jobs:
-  build:
+  buildJob:
     name: Greeting
     runs-on: ubuntu-latest
     env:
@@ -20,5 +20,5 @@ jobs:
         run: dotnet build $sourceFolder --configuration Release /p:Version=$assemblyVersion --no-restore
       - name: dotnet test
         run: dotnet test $sourceFolder --configuration Release --no-build
-      - name: dotnet publish
-        run: dotnet publish $sourceFolder --configuration Release --no-build --output /out
+#      - name: dotnet publish
+#        run: dotnet publish $sourceFolder --configuration Release --no-build --output /out
