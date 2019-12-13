@@ -14,4 +14,3 @@ namespace Lybecker.K8sFriendlyAspNetCore
             WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>();
     }
-}
