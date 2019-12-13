@@ -2,9 +2,9 @@ name: CI
 on:
   push:
     paths:
-    - '/src/**'
+    - 'src/**'
   pull_request:
-    paths: '/src/**'
+    paths: 'src/**'
 
 jobs:
   buildJob:
