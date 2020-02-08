@@ -18,7 +18,7 @@ Assuming you have a cluster, kubectl and [helm](https://helm.sh) configured.
 1. Clone this repository
 2. Generate self-signed certificate
     ```bash
-    dotnet dev-certs https -v -ep .\helmchart\k8sfriendlyaspnetcore\templates\_aspnetcore-cert.pfx -p createyourownpassword
+    dotnet dev-certs https -v -ep .\helmchart\k8sfriendlyaspnetcore\_aspnetcore-cert.pfx -p createyourownpassword
     ```
 3. Install via Helm
     ```bash
@@ -73,10 +73,10 @@ docker build --tag k8sfriendlyaspnetcore:v1 .
 Create a self-signed certificate and export it to a file:
 
 ```bash
-dotnet dev-certs https -v -ep .\HelmChart\k8sfriendlyaspnetcore\templates\_aspnetcore-cert.pfx -p createyourownpassword
+dotnet dev-certs https -v -ep .\HelmChart\k8sfriendlyaspnetcore\_aspnetcore-cert.pfx -p createyourownpassword
 ```
 
-> The certificate is stored in the Helm templates folder, as Helm Charts does not currently support files as parameters (issue [#3276](https://github.com/helm/helm/issues/3276)).
+> The certificate is stored in the Helm chart folder.
 
 ## Try to run the container locally with self-signed certificate
 
