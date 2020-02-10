@@ -54,7 +54,7 @@ Assuming you have a cluster, kubectl and [helm](https://helm.sh) configured.
 
     > Kubernetes will automatically create a new Pod if it is terminated. Verify bu testing the endpoint with curl and check the helm status.
 
-To remoce and purge the helm installation from the Kubernetes cluster run:
+To remove and purge the helm installation from the Kubernetes cluster run:
 ```bash
 helm del --purge nameofdeployment
 ```
@@ -75,6 +75,8 @@ Create a self-signed certificate and export it to a file:
 ```bash
 dotnet dev-certs https -v -ep .\HelmChart\k8sfriendlyaspnetcore\_aspnetcore-cert.pfx -p createyourownpassword
 ```
+
+**Note:** Development certificates on dotnet core 3.1 on Linux might be affected by [this OpenSSL issue](https://github.com/openssl/openssl/issues/1418#issuecomment-573388933). On Linux the workaround to create a self-signed certificate is documented in [this blogpost](https://andrewlock.net/creating-and-trusting-a-self-signed-certificate-on-linux-for-use-in-kestrel-and-asp-net-core/#creating-a-certificate-with-dns-san).
 
 > The certificate is stored in the Helm chart folder.
 
